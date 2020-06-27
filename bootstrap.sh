@@ -3,6 +3,12 @@
 set -e # exit on non zero return status
 set -v # Print shell input lines as they are read.
 
+. /vagrant/vars.sh
+
+# Disable swap
+swapoff -a
+sed '/swap/d' -i /etc/fstab
+
 # Load br_netfilter
 modprobe br_netfilter
 cp /vagrant/modules.load.d/bridge.conf /etc/modules-load.d/bridge.conf
@@ -30,6 +36,8 @@ apt-get update -qq
 
 echo "Install CRI-O"
 apt-get install -y cri-o-${CRIO_VERSION}
+systemctl enable crio
+systemctl start crio
 
 echo "Install kubelet, kubeadm, kubectl"
 apt-get install -y kubelet kubeadm kubectl
@@ -39,3 +47,6 @@ cp /vagrant/kubelet/config.yaml /var/lib/kubelet/config.yaml
 
 systemctl daemon-reload
 systemctl restart kubelet
+
+# Check network connectivity
+kubeadm config images pull
