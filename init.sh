@@ -9,3 +9,7 @@ kubectl apply -f https://docs.projectcalico.org/v3.14/manifests/calico.yaml
 
 # Allow scheduling Pods on control-plane nodes
 kubectl taint nodes --all node-role.kubernetes.io/master-
+
+# Install kubernetes dashboard
+kubectl apply -f /vagrant/dashboard/dashboard.yaml
+kubectl apply -f /vagrant/dashboard/admin-user.yaml
