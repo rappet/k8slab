@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 
+if [ -z $BASE_PATH ]; then
+  export BASE_PATH=/vagrant
+fi
+
 set -e # exit on non zero return status
 set -v # Print shell input lines as they are read.
 
-. /vagrant/vars.sh
+. $BASE_PATH/vars.sh
 
 # Disable swap
 swapoff -a
@@ -11,10 +15,10 @@ sed '/swap/d' -i /etc/fstab
 
 # Load br_netfilter
 modprobe br_netfilter
-cp /vagrant/modules.load.d/bridge.conf /etc/modules-load.d/bridge.conf
+cp $BASE_PATH/modules.load.d/bridge.conf /etc/modules-load.d/bridge.conf
 
 echo "Installing k8s network bridge sysctls"
-cp /vagrant/sysctl.conf.d/k8s.conf /etc/sysctl.d/k8s.conf
+cp $BASE_PATH/sysctl.conf.d/k8s.conf /etc/sysctl.d/k8s.conf
 sysctl --system
 
 echo "Install apt https protocol"
@@ -43,7 +47,7 @@ echo "Install kubelet, kubeadm, kubectl"
 apt-get install -y kubelet kubeadm kubectl
 
 echo "Copy kubelet config"
-cp /vagrant/kubelet/config.yaml /var/lib/kubelet/config.yaml
+cp $BASE_PATH/kubelet/config.yaml /var/lib/kubelet/config.yaml
 
 systemctl daemon-reload
 systemctl restart kubelet
